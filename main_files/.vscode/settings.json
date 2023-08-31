@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "ch32v003fun.h": "c"
+    }
+}

@@ -1,0 +1,328 @@
+
+Main.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .init:
+
+00000000 <InterruptVector>:
+void InterruptVectorDefault()  __attribute__((naked)) __attribute((section(".init")));
+
+
+void InterruptVectorDefault()
+{
+	asm volatile( "\n\
+   0:	0a00006f          	j	a0 <_einit>
+   4:	0000                	unimp
+   6:	0000                	unimp
+   8:	011c                	addi	a5,sp,128
+   a:	0000                	unimp
+   c:	011a                	slli	sp,sp,0x6
+	...
+  2e:	0000                	unimp
+  30:	011a                	slli	sp,sp,0x6
+  32:	0000                	unimp
+  34:	0000                	unimp
+  36:	0000                	unimp
+  38:	011a                	slli	sp,sp,0x6
+  3a:	0000                	unimp
+  3c:	0000                	unimp
+  3e:	0000                	unimp
+  40:	011a                	slli	sp,sp,0x6
+  42:	0000                	unimp
+  44:	011a                	slli	sp,sp,0x6
+  46:	0000                	unimp
+  48:	011a                	slli	sp,sp,0x6
+  4a:	0000                	unimp
+  4c:	011a                	slli	sp,sp,0x6
+  4e:	0000                	unimp
+  50:	011a                	slli	sp,sp,0x6
+  52:	0000                	unimp
+  54:	011a                	slli	sp,sp,0x6
+  56:	0000                	unimp
+  58:	011a                	slli	sp,sp,0x6
+  5a:	0000                	unimp
+  5c:	011a                	slli	sp,sp,0x6
+  5e:	0000                	unimp
+  60:	011a                	slli	sp,sp,0x6
+  62:	0000                	unimp
+  64:	011a                	slli	sp,sp,0x6
+  66:	0000                	unimp
+  68:	011a                	slli	sp,sp,0x6
+  6a:	0000                	unimp
+  6c:	011a                	slli	sp,sp,0x6
+  6e:	0000                	unimp
+  70:	011a                	slli	sp,sp,0x6
+  72:	0000                	unimp
+  74:	011a                	slli	sp,sp,0x6
+  76:	0000                	unimp
+  78:	011a                	slli	sp,sp,0x6
+  7a:	0000                	unimp
+  7c:	011a                	slli	sp,sp,0x6
+  7e:	0000                	unimp
+  80:	011a                	slli	sp,sp,0x6
+  82:	0000                	unimp
+  84:	011a                	slli	sp,sp,0x6
+  86:	0000                	unimp
+  88:	011a                	slli	sp,sp,0x6
+  8a:	0000                	unimp
+  8c:	011a                	slli	sp,sp,0x6
+  8e:	0000                	unimp
+  90:	011a                	slli	sp,sp,0x6
+  92:	0000                	unimp
+  94:	011a                	slli	sp,sp,0x6
+  96:	0000                	unimp
+  98:	011a                	slli	sp,sp,0x6
+  9a:	0000                	unimp
+  9c:	0000                	unimp
+	...
+
+Disassembly of section .text:
+
+000000a0 <handle_reset>:
+	asm volatile( ".option   pop;\n");
+}
+
+void handle_reset()
+{
+	asm volatile( "\n\
+  a0:	20000197          	auipc	gp,0x20000
+  a4:	76018193          	addi	gp,gp,1888 # 20000800 <_eusrstack>
+  a8:	00018113          	mv	sp,gp
+  ac:	08000513          	li	a0,128
+  b0:	30051073          	csrw	mstatus,a0
+  b4:	468d                	li	a3,3
+  b6:	00000517          	auipc	a0,0x0
+  ba:	f4a50513          	addi	a0,a0,-182 # 0 <InterruptVector>
+  be:	8d55                	or	a0,a0,a3
+  c0:	30551073          	csrw	mtvec,a0
+	csrw mtvec, a0\n" 
+	: : : "a0", "a3", "memory");
+
+	// Careful: Use registers to prevent overwriting of self-data.
+	// This clears out BSS.
+asm volatile(
+  c4:	20000517          	auipc	a0,0x20000
+  c8:	f3c50513          	addi	a0,a0,-196 # 20000000 <_data_vma>
+  cc:	20000597          	auipc	a1,0x20000
+  d0:	f3458593          	addi	a1,a1,-204 # 20000000 <_data_vma>
+  d4:	4601                	li	a2,0
+  d6:	00b55663          	bge	a0,a1,e2 <handle_reset+0x42>
+  da:	c110                	sw	a2,0(a0)
+  dc:	0511                	addi	a0,a0,4
+  de:	feb54ee3          	blt	a0,a1,da <handle_reset+0x3a>
+  e2:	22800513          	li	a0,552
+  e6:	20000597          	auipc	a1,0x20000
+  ea:	f1a58593          	addi	a1,a1,-230 # 20000000 <_data_vma>
+  ee:	20000617          	auipc	a2,0x20000
+  f2:	f1260613          	addi	a2,a2,-238 # 20000000 <_data_vma>
+  f6:	00c58863          	beq	a1,a2,106 <handle_reset+0x66>
+  fa:	4114                	lw	a3,0(a0)
+  fc:	c194                	sw	a3,0(a1)
+  fe:	0511                	addi	a0,a0,4
+ 100:	0591                	addi	a1,a1,4
+ 102:	fec59ae3          	bne	a1,a2,f6 <handle_reset+0x56>
+
+
+#if defined( FUNCONF_SYSTICK_USE_HCLK ) && FUNCONF_SYSTICK_USE_HCLK
+	SysTick->CTLR = 5;
+#else
+	SysTick->CTLR = 1;
+ 106:	e000f7b7          	lui	a5,0xe000f
+ 10a:	4705                	li	a4,1
+ 10c:	c398                	sw	a4,0(a5)
+#endif
+
+	// set mepc to be main as the root app.
+asm volatile(
+ 10e:	18200793          	li	a5,386
+ 112:	34179073          	csrw	mepc,a5
+ 116:	30200073          	mret
+
+0000011a <ADC1_IRQHandler>:
+	asm volatile( "1: j 1b" );
+ 11a:	a001                	j	11a <ADC1_IRQHandler>
+
+0000011c <NMI_Handler>:
+	RCC->INTR |= RCC_CSSC;	// clear the clock security int flag
+ 11c:	40021737          	lui	a4,0x40021
+ 120:	471c                	lw	a5,8(a4)
+ 122:	008006b7          	lui	a3,0x800
+ 126:	8fd5                	or	a5,a5,a3
+ 128:	c71c                	sw	a5,8(a4)
+
+0000012a <SystemInit>:
+#define BASE_CTLR	(((FUNCONF_HSITRIM) << 3) | RCC_HSION | HSEBYP | RCC_CSS)
+//#define BASE_CTLR	(((FUNCONF_HSITRIM) << 3) | HSEBYP | RCC_CSS)	// disable HSI in HSE modes
+
+#if defined(FUNCONF_USE_HSI) && FUNCONF_USE_HSI
+	#if defined(FUNCONF_USE_PLL) && FUNCONF_USE_PLL
+		RCC->CFGR0 = RCC_HPRE_DIV1 | RCC_PLLSRC_HSI_Mul2;
+ 12a:	400217b7          	lui	a5,0x40021
+		RCC->CTLR  = BASE_CTLR | RCC_HSION | RCC_PLLON; 			// Use HSI, enable PLL.
+ 12e:	01080737          	lui	a4,0x1080
+		RCC->CFGR0 = RCC_HPRE_DIV1 | RCC_PLLSRC_HSI_Mul2;
+ 132:	0007a223          	sw	zero,4(a5) # 40021004 <_eusrstack+0x20020804>
+		RCC->CTLR  = BASE_CTLR | RCC_HSION | RCC_PLLON; 			// Use HSI, enable PLL.
+ 136:	08170713          	addi	a4,a4,129 # 1080081 <Main.c.9b928b2c+0x107e59c>
+ 13a:	c398                	sw	a4,0(a5)
+		RCC->CTLR = BASE_CTLR | RCC_HSEON | RCC_PLLON;				// start PLL
+	#endif
+#endif
+
+#if FUNCONF_SYSTEM_CORE_CLOCK > 25000000
+	FLASH->ACTLR = FLASH_ACTLR_LATENCY_1;                   		//+1 Cycle Latency
+ 13c:	4685                	li	a3,1
+ 13e:	40022737          	lui	a4,0x40022
+ 142:	c314                	sw	a3,0(a4)
+#else
+	FLASH->ACTLR = FLASH_ACTLR_LATENCY_0;                   		// +0 Cycle Latency
+#endif
+
+	RCC->INTR  = 0x009F0000;                               			// Clear PLL, CSSC, HSE, HSI and LSI ready flags.
+ 144:	009f0737          	lui	a4,0x9f0
+ 148:	c798                	sw	a4,8(a5)
+
+#if defined(FUNCONF_USE_PLL) && FUNCONF_USE_PLL
+	while((RCC->CTLR & RCC_PLLRDY) == 0);                       	// Wait till PLL is ready
+ 14a:	020006b7          	lui	a3,0x2000
+ 14e:	40021737          	lui	a4,0x40021
+ 152:	431c                	lw	a5,0(a4)
+ 154:	8ff5                	and	a5,a5,a3
+ 156:	dff5                	beqz	a5,152 <SystemInit+0x28>
+	uint32_t tmp32 = RCC->CFGR0 & ~(0x03);							// clr the SW
+ 158:	435c                	lw	a5,4(a4)
+	RCC->CFGR0 = tmp32 | RCC_SW_PLL;                       			// Select PLL as system clock source
+	while ((RCC->CFGR0 & (uint32_t)RCC_SWS) != (uint32_t)0x08); 	// Wait till PLL is used as system clock source
+ 15a:	400216b7          	lui	a3,0x40021
+	uint32_t tmp32 = RCC->CFGR0 & ~(0x03);							// clr the SW
+ 15e:	9bf1                	andi	a5,a5,-4
+	RCC->CFGR0 = tmp32 | RCC_SW_PLL;                       			// Select PLL as system clock source
+ 160:	0027e793          	ori	a5,a5,2
+ 164:	c35c                	sw	a5,4(a4)
+	while ((RCC->CFGR0 & (uint32_t)RCC_SWS) != (uint32_t)0x08); 	// Wait till PLL is used as system clock source
+ 166:	4721                	li	a4,8
+ 168:	42dc                	lw	a5,4(a3)
+ 16a:	8bb1                	andi	a5,a5,12
+ 16c:	fee79ee3          	bne	a5,a4,168 <SystemInit+0x3e>
+	*DMDATA1 = 0x0;
+ 170:	e00007b7          	lui	a5,0xe0000
+ 174:	0e07ac23          	sw	zero,248(a5) # e00000f8 <_eusrstack+0xbffff8f8>
+	*DMDATA0 = 0x80;
+ 178:	08000713          	li	a4,128
+ 17c:	0ee7aa23          	sw	a4,244(a5)
+	SetupUART( UART_BRR );
+#endif
+#if defined( FUNCONF_USE_DEBUGPRINTF ) && FUNCONF_USE_DEBUGPRINTF
+	SetupDebugPrintf();
+#endif
+}
+ 180:	8082                	ret
+
+00000182 <main>:
+#include "ch32v003fun.h"
+#include <stdio.h>
+
+int main()
+{
+ 182:	1151                	addi	sp,sp,-12
+ 184:	c406                	sw	ra,8(sp)
+	SystemInit();
+ 186:	3755                	jal	12a <SystemInit>
+
+	// Enable GPIOs
+	RCC->APB2PCENR |= RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOC;
+ 188:	40021737          	lui	a4,0x40021
+ 18c:	4f1c                	lw	a5,24(a4)
+	// GPIO D0 Push-Pull
+	GPIOD->CFGLR &= ~(0xf<<(4*0));
+	GPIOD->CFGLR |= (GPIO_Speed_10MHz | GPIO_CNF_OUT_PP)<<(4*0);
+
+	// GPIO D4 Push-Pull
+	GPIOD->CFGLR &= ~(0xf<<(4*4));
+ 18e:	fff10637          	lui	a2,0xfff10
+ 192:	167d                	addi	a2,a2,-1
+	RCC->APB2PCENR |= RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOC;
+ 194:	0307e793          	ori	a5,a5,48
+ 198:	cf1c                	sw	a5,24(a4)
+	GPIOD->CFGLR &= ~(0xf<<(4*0));
+ 19a:	40011737          	lui	a4,0x40011
+ 19e:	40070793          	addi	a5,a4,1024 # 40011400 <_eusrstack+0x20010c00>
+ 1a2:	4394                	lw	a3,0(a5)
+	GPIOC->CFGLR &= ~(0xf<<(4*0));
+	GPIOC->CFGLR |= (GPIO_Speed_10MHz | GPIO_CNF_OUT_PP)<<(4*0);
+
+	while(1)
+	{
+		GPIOD->BSHR = (1<<0) | (1<<4) | (1<<6);	 // Turn on GPIOs
+ 1a4:	40011537          	lui	a0,0x40011
+ 1a8:	05100093          	li	ra,81
+	GPIOD->CFGLR &= ~(0xf<<(4*0));
+ 1ac:	9ac1                	andi	a3,a3,-16
+ 1ae:	c394                	sw	a3,0(a5)
+	GPIOD->CFGLR |= (GPIO_Speed_10MHz | GPIO_CNF_OUT_PP)<<(4*0);
+ 1b0:	4394                	lw	a3,0(a5)
+		GPIOC->BSHR = (1<<0);
+ 1b2:	4305                	li	t1,1
+		Delay_Ms( 250 );
+		GPIOD->BSHR = (1<<16) | (1<<(16+4)) | (1<<(16+6)); // Turn off GPIOs
+ 1b4:	005102b7          	lui	t0,0x510
+	GPIOD->CFGLR |= (GPIO_Speed_10MHz | GPIO_CNF_OUT_PP)<<(4*0);
+ 1b8:	0016e693          	ori	a3,a3,1
+ 1bc:	c394                	sw	a3,0(a5)
+	GPIOD->CFGLR &= ~(0xf<<(4*4));
+ 1be:	4394                	lw	a3,0(a5)
+		GPIOC->BSHR = (1<<16);
+ 1c0:	63c1                	lui	t2,0x10
+	GPIOD->CFGLR &= ~(0xf<<(4*4));
+ 1c2:	8ef1                	and	a3,a3,a2
+ 1c4:	c394                	sw	a3,0(a5)
+	GPIOD->CFGLR |= (GPIO_Speed_10MHz | GPIO_CNF_OUT_PP)<<(4*4);
+ 1c6:	4394                	lw	a3,0(a5)
+ 1c8:	6641                	lui	a2,0x10
+ 1ca:	8ed1                	or	a3,a3,a2
+ 1cc:	c394                	sw	a3,0(a5)
+	GPIOD->CFGLR &= ~(0xf<<(4*6));
+ 1ce:	4394                	lw	a3,0(a5)
+ 1d0:	f1000637          	lui	a2,0xf1000
+ 1d4:	167d                	addi	a2,a2,-1
+ 1d6:	8ef1                	and	a3,a3,a2
+ 1d8:	c394                	sw	a3,0(a5)
+	GPIOD->CFGLR |= (GPIO_Speed_10MHz | GPIO_CNF_OUT_PP)<<(4*6);
+ 1da:	4394                	lw	a3,0(a5)
+ 1dc:	01000637          	lui	a2,0x1000
+ 1e0:	8ed1                	or	a3,a3,a2
+ 1e2:	c394                	sw	a3,0(a5)
+	GPIOC->CFGLR &= ~(0xf<<(4*0));
+ 1e4:	4314                	lw	a3,0(a4)
+ 1e6:	9ac1                	andi	a3,a3,-16
+ 1e8:	c314                	sw	a3,0(a4)
+	GPIOC->CFGLR |= (GPIO_Speed_10MHz | GPIO_CNF_OUT_PP)<<(4*0);
+ 1ea:	4314                	lw	a3,0(a4)
+ 1ec:	0016e693          	ori	a3,a3,1
+ 1f0:	c314                	sw	a3,0(a4)
+	uint32_t targend = SysTick->CNT + n;
+ 1f2:	0016e6b7          	lui	a3,0x16e
+ 1f6:	e000f737          	lui	a4,0xe000f
+ 1fa:	36068693          	addi	a3,a3,864 # 16e360 <Main.c.9b928b2c+0x16c87b>
+		GPIOD->BSHR = (1<<0) | (1<<4) | (1<<6);	 // Turn on GPIOs
+ 1fe:	0017a823          	sw	ra,16(a5)
+		GPIOC->BSHR = (1<<0);
+ 202:	00652823          	sw	t1,16(a0) # 40011010 <_eusrstack+0x20010810>
+ 206:	470c                	lw	a1,8(a4)
+ 208:	95b6                	add	a1,a1,a3
+	while( ((int32_t)( SysTick->CNT - targend )) < 0 );
+ 20a:	4710                	lw	a2,8(a4)
+ 20c:	8e0d                	sub	a2,a2,a1
+ 20e:	fe064ee3          	bltz	a2,20a <main+0x88>
+		GPIOD->BSHR = (1<<16) | (1<<(16+4)) | (1<<(16+6)); // Turn off GPIOs
+ 212:	0057a823          	sw	t0,16(a5)
+		GPIOC->BSHR = (1<<16);
+ 216:	00752823          	sw	t2,16(a0)
+	uint32_t targend = SysTick->CNT + n;
+ 21a:	470c                	lw	a1,8(a4)
+ 21c:	95b6                	add	a1,a1,a3
+	while( ((int32_t)( SysTick->CNT - targend )) < 0 );
+ 21e:	4710                	lw	a2,8(a4)
+ 220:	8e0d                	sub	a2,a2,a1
+ 222:	fe064ee3          	bltz	a2,21e <main+0x9c>
+ 226:	bfe1                	j	1fe <main+0x7c>
