@@ -7,10 +7,14 @@
 *.obj
 *.elf
 
+# Embedded C files
+*.bin
+
 # Linker output
 *.ilk
 *.map
 *.exp
+*.lst
 
 # Precompiled Headers
 *.gch
